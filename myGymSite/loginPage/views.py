@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib import messages
 from loginPage.utils import get_db_handle, get_collection_handle, validatePassword
 import datetime;
   
@@ -27,17 +28,21 @@ def doLogin(request):
 
     username = request.POST.get('username')
     password = request.POST.get('password')
-
-    if (username is not None and password is not None):
-        
-        #Add failed login attempts into Database
+    
+    if (len(username)!= 0 and len(password)!= 0 ):
 
         if (validatePassword(db_handle,username,password)):
-            return HttpResponse("Login Success")
-        else:
+            return  redirect('addUser')
+        else: #Add failed login attempts into Database
             login_collection = get_collection_handle(db_handle, "login_log")
             sso = login_collection.insert({"case":"login performed","username":username, "password":password,"time_stamp":datetime.datetime.now()})
-            return HttpResponse("Login Failed")
+            messages.error(request,"Invalid Credentials")
+            return redirect('login')
+    else:
+        messages.error(request,"Username or Password cannot be empty")
+        return redirect('login')
+
     
-    
+def addUser(request):
+    return render(request,"gym_addUser.html")
 
