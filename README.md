@@ -1,1 +1,3 @@
-# Gym-Management-
+# Gym Management System
+
+Using Django, Python & MongoDB
